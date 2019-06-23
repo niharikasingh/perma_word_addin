@@ -52,22 +52,24 @@ export default class App extends React.Component {
       // save context of selection so it can be used in callback after fetch 
       context.trackedObjects.add(currentCiteSelection);
       // fetch perma.cc link for this selection
-      fetch("https://cors-anywhere.herokuapp.com/https://api.perma.cc/v1/folders?api_key=" + this.state.apiKey, {
-        method: "GET",
+      fetch("https://cors-anywhere.herokuapp.com/https://api.perma.cc/v1/archives?api_key=" + this.state.apiKey, {
+        method: "POST",
         mode: "cors",
         headers: {
-          "Access-Control-Allow-Origin": "*"
-        }
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({url: currentCiteSelectionText})
       }).then(async response => {
+        // get guid from response and insert into word document 
         let responsebody = await response.json();
-        let folders = "";
-        for (let f of responsebody.objects) {
-          folders += f.name;
-        }
-        console.log("fetch folders " + folders);
-        currentCiteSelection.insertText(folders, Word.InsertLocation.end);
+        console.log("fetch guid " + responsebody.guid);
+        currentCiteSelection.insertText(" [https://perma.cc/" + responsebody.guid + "]" , Word.InsertLocation.end);
+        // remove context of selection because we're done using it 
         currentCiteSelection.context.trackedObjects.remove(currentCiteSelection);
         currentCiteSelection.context.sync();
+        // remove request from list of pending requests 
         this.setState(prevState => (
           {pending: prevState.pending.filter(item => item !== currentCiteSelectionText)}
         ));
