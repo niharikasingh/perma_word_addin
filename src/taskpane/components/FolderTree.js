@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { Icon } from 'office-ui-fabric-react/lib/Icon';
 
+// Component that renders the user's folder structure
+
 export default class FolderTree extends React.Component {
   constructor(props, context) {
     super(props, context);
+    // details about current folder 
     this.state = {
       "id": this.props.id,
       "name": this.props.name,
@@ -19,7 +22,8 @@ export default class FolderTree extends React.Component {
 
   toggleFolder = async () => {
     console.log("Clicked folder, started handler.");
-    if ((this.state.children != null) || (this.state.has_children == false)) { // we already have children folders, don't need to fetch them again 
+    // we already have children folders, don't need to fetch them again
+    if ((this.state.children != null) || (this.state.has_children == false)) {
       this.setState(prevState => ({
         "open": !prevState.open
       }));
@@ -38,7 +42,7 @@ export default class FolderTree extends React.Component {
         if (response.status != 200) {
           throw "Error in toggleFolder response " + this.state.id;
         }
-        // get user details  
+        // store children folders' details  
         let responsebody = await response.json();
         console.log("fetch toggleFolder responsebody " + JSON.stringify(responsebody));
         this.setState(prevState => ({
@@ -61,7 +65,7 @@ export default class FolderTree extends React.Component {
             onClick={this.toggleFolder}
             alt="Click to open or close this folder" />
         }
-        {!this.state.has_children && <Icon className="folderIcon" iconName="DoubleChevronRight" />}
+        {!this.state.has_children && <Icon className="folderIcon" iconName="LocationDot" />}
         <div
           className={"folderName" + ((this.props.selectedFolderId == this.state.id) ? " selected" : "")}
           onClick={() => this.props.updateFn(this.state.id)}>

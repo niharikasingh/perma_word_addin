@@ -20,13 +20,7 @@ export default class App extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.setState({
-      apiKey: "",
-      pending: []
-    })
-  }
-
+  // update what the currently selected folder is
   updateSelectedFolderId = (id) => {
     console.log("updateSelectedFolderId function called with id: " + id);
     if (this.state.selectedFolderId != id) {
@@ -36,6 +30,7 @@ export default class App extends React.Component {
     }
   }
 
+  // validate API key by checking its length
   showErrorMessage = (newValue) => {
     if (newValue.length == 40) {
       this.setState({ apiKey: newValue });
@@ -50,6 +45,7 @@ export default class App extends React.Component {
     return "API Key should be 40 characters"
   }
 
+  // is API key valid?
   apiKeyNotReady = () => !(this.state.apiKey.length == 40) || this.state.apiKeyError;
 
   userDetails = async () => {
@@ -73,7 +69,7 @@ export default class App extends React.Component {
         apiKeyError: false,
         userName: responsebody.full_name,
         folderTree: responsebody.top_level_folders,
-        selectedFolderId: responsebody.top_level_folders[0].id, // initialize to default folder 
+        selectedFolderId: responsebody.top_level_folders[0].id, // initialize to default folder = first top folder
       });
     }).catch(err => {
       console.log(err);
