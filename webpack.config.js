@@ -47,10 +47,10 @@ module.exports = async (env, options)  => {
               query: {
                   name: 'assets/[name].[ext]'
                 }
-              }  
-            }   
+              }
+            }
           ]
-    },    
+    },
     plugins: [
       new CleanWebpackPlugin(),
       new CopyWebpackPlugin([
@@ -84,6 +84,12 @@ module.exports = async (env, options)  => {
     devServer: {
       headers: {
         "Access-Control-Allow-Origin": "*"
+      },
+      proxy: {
+        '/v1': {
+          changeOrigin: true,
+          target: 'https://api.perma.cc',
+        }
       },
       https: await devCerts.getHttpsServerOptions(),
       port: 3000

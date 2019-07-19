@@ -6,7 +6,7 @@ import { Icon } from 'office-ui-fabric-react/lib/Icon';
 export default class FolderTree extends React.Component {
   constructor(props, context) {
     super(props, context);
-    // details about current folder 
+    // details about current folder
     this.state = {
       "id": this.props.id,
       "name": this.props.name,
@@ -15,7 +15,7 @@ export default class FolderTree extends React.Component {
       "path": this.props.path,
       "organization": this.props.organization,
       "open": false,
-      "children": null, // null means no request made yet to ask for all children of this folder 
+      "children": null, // null means no request made yet to ask for all children of this folder
       "apiKey": this.props.apiKey
     }
   }
@@ -30,19 +30,13 @@ export default class FolderTree extends React.Component {
     }
     else { // fetch children folders
       console.log("Clicked folder, fetching children.");
-      fetch("https://cors-anywhere.herokuapp.com/https://api.perma.cc/v1/folders/" + this.state.id + "/folders?api_key=" + this.state.apiKey, {
+      fetch("/v1/folders/" + this.state.id + "/folders?api_key=" + this.state.apiKey, {
         method: "GET",
-        mode: "cors",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        }
       }).then(async response => {
         if (response.status != 200) {
           throw "Error in toggleFolder response " + this.state.id;
         }
-        // store children folders' details  
+        // store children folders' details
         let responsebody = await response.json();
         console.log("fetch toggleFolder responsebody " + JSON.stringify(responsebody));
         this.setState(prevState => ({

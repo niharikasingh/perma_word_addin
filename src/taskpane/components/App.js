@@ -11,12 +11,12 @@ export default class App extends React.Component {
   constructor(props, context) {
     super(props, context);
     this.state = {
-      apiKey: "", // stores user's api key 
+      apiKey: "", // stores user's api key
       apiKeyError: false, // True when api key does not lead to valid user details
-      pending: [], // stores links that are pending transformation to perma links 
-      userName: '', // stores user's full name 
+      pending: [], // stores links that are pending transformation to perma links
+      userName: '', // stores user's full name
       folderTree: [], // stores user's top-level folder tree
-      selectedFolderId: '', // stores the folder ID to save links to 
+      selectedFolderId: '', // stores the folder ID to save links to
     };
   }
 
@@ -49,20 +49,14 @@ export default class App extends React.Component {
   apiKeyNotReady = () => !(this.state.apiKey.length == 40) || this.state.apiKeyError;
 
   userDetails = async () => {
-    // fetch user full name 
-    fetch("https://cors-anywhere.herokuapp.com/https://api.perma.cc/v1/user/?api_key=" + this.state.apiKey, {
+    // fetch user full name
+    fetch("/v1/user/?api_key=" + this.state.apiKey, {
       method: "GET",
-      mode: "cors",
-      headers: {
-        "Access-Control-Allow-Origin": "*",
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-      }
     }).then(async response => {
       if (response.status != 200) {
         throw "Error in userDetails response";
       }
-      // get user details  
+      // get user details
       let responsebody = await response.json();
       console.log("fetch userDetails responsebody " + JSON.stringify(responsebody));
       this.setState({
@@ -78,42 +72,36 @@ export default class App extends React.Component {
     });
   }
 
-  // upon click, return perma link of selected link text to user 
+  // upon click, return perma link of selected link text to user
   click = async () => {
     return Word.run(async context => {
       // get current selection object
       console.log("starting click function");
       let currentCiteSelection = context.document.getSelection();
-      // get current selection text 
+      // get current selection text
       currentCiteSelection.load("text");
       await context.sync();
       let currentCiteSelectionText = currentCiteSelection.text;
       console.log("click: currentCiteSelectionText " + currentCiteSelectionText);
-      // track perma requests that are pending 
+      // track perma requests that are pending
       this.setState(prevState => ({ pending: [...prevState.pending, currentCiteSelectionText] }));
       console.log("this.state");
       console.log(this.state);
-      // save context of selection so it can be used in callback after fetch 
+      // save context of selection so it can be used in callback after fetch
       context.trackedObjects.add(currentCiteSelection);
       // fetch perma.cc link for this selection
-      fetch("https://cors-anywhere.herokuapp.com/https://api.perma.cc/v1/archives?api_key=" + this.state.apiKey, {
+      fetch("/v1/archives?api_key=" + this.state.apiKey, {
         method: "POST",
-        mode: "cors",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-        },
         body: JSON.stringify({ url: currentCiteSelectionText, folder: this.state.selectedFolderId })
       }).then(async response => {
-        // get guid from response and insert into word document 
+        // get guid from response and insert into word document
         let responsebody = await response.json();
         console.log("fetch guid " + responsebody.guid);
         currentCiteSelection.insertText(" [https://perma.cc/" + responsebody.guid + "]", Word.InsertLocation.end);
-        // remove context of selection because we're done using it 
+        // remove context of selection because we're done using it
         currentCiteSelection.context.trackedObjects.remove(currentCiteSelection);
         currentCiteSelection.context.sync();
-        // remove request from list of pending requests 
+        // remove request from list of pending requests
         this.setState(prevState => (
           { pending: prevState.pending.filter(item => item !== currentCiteSelectionText) }
         ));
