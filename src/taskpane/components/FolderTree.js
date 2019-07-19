@@ -6,6 +6,8 @@ import { Icon } from 'office-ui-fabric-react/lib/Icon';
 export default class FolderTree extends React.Component {
   constructor(props, context) {
     super(props, context);
+    console.log("New folder constructed with");
+    console.log(this.props);
     // details about current folder
     this.state = {
       "id": this.props.id,
@@ -51,7 +53,7 @@ export default class FolderTree extends React.Component {
 
   render() {
     return (
-      <div className="folder">
+      <div className={"folder" + (this.props.hidden ? " hidden" : "")}>
         {this.state.has_children &&
           <Icon
             className="folderIcon"
@@ -66,12 +68,10 @@ export default class FolderTree extends React.Component {
           {this.state.name}
         </div>
         <div className="folderLevelDown">
-          {this.state.open && !this.state.has_children &&
-            <span>This folder is empty</span>
-          }
-          {this.state.open && this.state.has_children && // recursion!!!
+          {this.state.children && this.state.children.length > 0 && // recursion!!!
             this.state.children.map(child_folder =>
               <FolderTree
+                hidden = {!this.state.open}
                 apiKey={this.state.apiKey}
                 key={child_folder.id}
                 id={child_folder.id}

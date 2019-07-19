@@ -139,6 +139,7 @@ export default class App extends React.Component {
           {!this.apiKeyNotReady() && this.state.folderTree.map(top_folder => {
             console.log("Top level folder being prepared for display: " + JSON.stringify(top_folder));
             return <FolderTree
+              hidden={false}
               apiKey={this.state.apiKey}
               key={top_folder.id}
               id={top_folder.id}
